@@ -1,8 +1,13 @@
+{-# OPTIONS_GHC -cpp #-}
 import Control.Monad(when)
 import System.Console.GetOpt
 import System.Environment
 import System.IO
+#if defined(mingw32_HOST_OS) || defined(__MINGW32__)
+import GHC.ConsoleHandler
+#else
 import System.Posix.Signals
+#endif
 
 -- enumeration for the available command line options:
 data OptionFlag = Append | IgnoreInterrupt
@@ -20,12 +25,19 @@ parseCommand args =
 	  	    , Option ['i'] ["ignore"] (NoArg IgnoreInterrupt) "ignore user interrupt"
 	  	    ]
 
+ignoreINT :: IO ()
+ignoreINT = do
+#if defined(mingw32_HOST_OS) || defined(__MINGW32__)
+	installHandler Ignore			-- ignore all signals (stupid Windows)
+#else
+        installHandler sigINT Ignore Nothing	-- ignore sigINT
+#endif
+	return ()
+
 main = do
     args <- getArgs				-- bind command arguments to args
     (opts, files) <- parseCommand args		-- parse out the options from the files
-    when (IgnoreInterrupt `elem` opts) $ do	-- should we disable interrupt?
-        installHandler sigINT Ignore Nothing	-- ignore sigINT
-	return ()				-- this returns an (IO ()) from the 'when'
+    when (IgnoreInterrupt `elem` opts) $ ignoreINT	-- should we disable interrupt?
     theOutput <- getContents			-- lazy String acts as an input pipe
     let mode = if (Append `elem` opts) then AppendMode else WriteMode	-- open mode based on -a
         in do
