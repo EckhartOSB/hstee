@@ -24,7 +24,7 @@ main = do
     args <- getArgs				-- bind command arguments to args
     (opts, files) <- parseCommand args		-- parse out the options from the files
     when (IgnoreInterrupt `elem` opts) $ do	-- should we disable interrupt?
-        installHandler sigINT (Catch $ return ()) Nothing	-- "return ()" is our do-nothing
+        installHandler sigINT Ignore Nothing	-- ignore sigINT
 	return ()				-- this returns an (IO ()) from the 'when'
     theOutput <- getContents			-- lazy String acts as an input pipe
     let mode = if (Append `elem` opts) then AppendMode else WriteMode	-- open mode based on -a
