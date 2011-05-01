@@ -1,0 +1,35 @@
+hstee		Haskell version of Unix tee utility
+
+Chip Camden	May, 2011
+
+This little program implements the standard tee utility
+options:
+
+Usage: tee [-ai] files...
+  -a  --append  append instead of overwrite
+  -i  --ignore  ignore user interrupt
+
+Its chief purpose was to help me learn more thoroughly
+about Haskell's IO module (and reading the code might help
+you to do the same), but it has the added benefit of
+producing a native-compiled version of tee for any platform
+on which Haskell is supported (including one very popular
+operating system from my home state of Washington, from which
+the authors saw fit to exclude any equivalent of tee).
+
+To build this little utility:
+
+1. Install Haskell, if you haven't already.  On FreeBSD, it's
+   in the ports (lang/ghc).  Otherwise, see:
+   http://hackage.haskell.org/platform/
+
+2. In the hstee project directory, type:
+
+   ghc --make tee
+
+3. On Unixish systems, the resulting executable doesn't give
+   you anything that /usr/bin/tee doesn't, but on Windows you
+   might want to copy tee.exe to some handy spot along your
+   PATH.
+
+END
