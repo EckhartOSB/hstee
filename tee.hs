@@ -35,15 +35,14 @@ ignoreINT = do
 	return ()
 
 main = do
-    args <- getArgs				-- bind command arguments to args
-    (opts, files) <- parseCommand args		-- parse out the options from the files
+    (opts, files) <- getArgs >>= parseCommand		-- parse out the options from the files
     when (IgnoreInterrupt `elem` opts) $ ignoreINT	-- should we disable interrupt?
-    theOutput <- getContents			-- lazy String acts as an input pipe
+    theOutput <- getContents				-- lazy String acts as an input pipe
     let mode = if (Append `elem` opts) then AppendMode else WriteMode	-- open mode based on -a
         in do
 	    handles <- mapM (`openFile` mode) files			-- open all the files
-	    					-- build a sequence of IO operations that output
-						-- each line of text to each handle, starting
-						-- with stdout
+	    						-- build a sequence of IO operations that output
+							-- each line of text to each handle, starting
+							-- with stdout
 	    sequence [ hPutStrLn h l | l <- lines theOutput, h <- stdout:handles ]
-            mapM_ hClose handles		-- close all the handles (except stdout)
+            mapM_ hClose handles			-- close all the handles (except stdout)
